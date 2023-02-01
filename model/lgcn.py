@@ -59,7 +59,7 @@ class LGCN(nn.Module):
         else:
             embedding_path = opt.get_string('embedding_path')
             self.embedding = nn.Embedding.from_pretrained(
-                torch.load(embedding_path), freeze=False
+                torch.load("cache/tgif/transition_embedding.pt"), freeze=False
             )
             logger.info(f'Using pretrained embedding: {embedding_path}')
 
@@ -174,7 +174,7 @@ class LGCN(nn.Module):
             a2, a2_length, a2_chars,
             a3, a3_length, a3_chars,
             a4, a4_length, a4_chars,
-            a5, a5_length, a5_chars,
+            # a5, a5_length, a5_chars,
             features, c3d_features, bbox_features, bbox
     ):
 
@@ -202,20 +202,20 @@ class LGCN(nn.Module):
             a2_embedding = self.embedding(a2)
             a3_embedding = self.embedding(a3)
             a4_embedding = self.embedding(a4)
-            a5_embedding = self.embedding(a5)
+            # a5_embedding = self.embedding(a5)
 
             if self.use_char_embedding:
                 a1_chars = self.char_embedding(a1_chars)
                 a2_chars = self.char_embedding(a2_chars)
                 a3_chars = self.char_embedding(a3_chars)
                 a4_chars = self.char_embedding(a4_chars)
-                a5_chars = self.char_embedding(a5_chars)
+                # a5_chars = self.char_embedding(a5_chars)
 
                 a1_embedding = self.mix_embedding(a1_chars, a1_embedding)
                 a2_embedding = self.mix_embedding(a2_chars, a2_embedding)
                 a3_embedding = self.mix_embedding(a3_chars, a3_embedding)
                 a4_embedding = self.mix_embedding(a4_chars, a4_embedding)
-                a5_embedding = self.mix_embedding(a5_chars, a5_embedding)
+                # a5_embedding = self.mix_embedding(a5_chars, a5_embedding)
 
         raw_out_question, _ = self.lstm_raw(
             question_embedding, question_length)
@@ -225,7 +225,7 @@ class LGCN(nn.Module):
             raw_out_a2, _ = self.lstm_raw(a2_embedding, a2_length)
             raw_out_a3, _ = self.lstm_raw(a3_embedding, a3_length)
             raw_out_a4, _ = self.lstm_raw(a4_embedding, a4_length)
-            raw_out_a5, _ = self.lstm_raw(a5_embedding, a5_length)
+            # raw_out_a5, _ = self.lstm_raw(a5_embedding, a5_length)
 
         video_embedding = self.video_fc(
             features.transpose(1, 2)).transpose(1, 2)
@@ -290,8 +290,8 @@ class LGCN(nn.Module):
                 video_embedding, video_length, raw_out_a3, a3_length)
             u_a4, _ = self.attention(
                 video_embedding, video_length, raw_out_a4, a4_length)
-            u_a5, _ = self.attention(
-                video_embedding, video_length, raw_out_a5, a5_length)
+            # u_a5, _ = self.attention(
+            #     video_embedding, video_length, raw_out_a5, a5_length)
 
             concat_a1 = torch.cat(
                 [video_embedding, u_a1, u_q, u_a1 * video_embedding, u_q * video_embedding], dim=-1
@@ -305,25 +305,25 @@ class LGCN(nn.Module):
             concat_a4 = torch.cat(
                 [video_embedding, u_a4, u_q, u_a4 * video_embedding, u_q * video_embedding], dim=-1
             )
-            concat_a5 = torch.cat(
-                [video_embedding, u_a5, u_q, u_a5 * video_embedding, u_q * video_embedding], dim=-1
-            )
+            # concat_a5 = torch.cat(
+            #     [video_embedding, u_a5, u_q, u_a5 * video_embedding, u_q * video_embedding], dim=-1
+            # )
 
             mature_out_a1, _ = self.lstm_mature(concat_a1, video_length)
             mature_out_a2, _ = self.lstm_mature(concat_a2, video_length)
             mature_out_a3, _ = self.lstm_mature(concat_a3, video_length)
             mature_out_a4, _ = self.lstm_mature(concat_a4, video_length)
-            mature_out_a5, _ = self.lstm_mature(concat_a5, video_length)
+            # mature_out_a5, _ = self.lstm_mature(concat_a5, video_length)
 
             matrue_maxout_a1 = self._pooling(mature_out_a1, keepdim=True)
             matrue_maxout_a2 = self._pooling(mature_out_a2, keepdim=True)
             matrue_maxout_a3 = self._pooling(mature_out_a3, keepdim=True)
             matrue_maxout_a4 = self._pooling(mature_out_a4, keepdim=True)
-            matrue_maxout_a5 = self._pooling(mature_out_a5, keepdim=True)
+            # matrue_maxout_a5 = self._pooling(mature_out_a5, keepdim=True)
 
             mature_answers = torch.cat(
                 [matrue_maxout_a1, matrue_maxout_a2, matrue_maxout_a3,
-                 matrue_maxout_a4, matrue_maxout_a5],
+                 matrue_maxout_a4],
                 dim=1
             )
 

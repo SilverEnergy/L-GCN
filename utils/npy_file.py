@@ -21,7 +21,8 @@ class NpyFile:
         self.data = np.load(self.data_path, mmap_mode=mode)
 
     def __getitem__(self, name: str) -> np.memmap:
-
+        # print("#####")
+        # print(name)
         index, length = self.indices[name]
 
         return self.data[index: index + length]

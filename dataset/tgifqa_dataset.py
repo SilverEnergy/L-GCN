@@ -23,7 +23,7 @@ class VQAFeatureDataset(Dataset):
         self.task = opt.get_string('task')
         self.num_frames = opt.get_int('num_frames')
         self.question_path = os.path.join(
-            opt.get_string('question_path'),
+            opt.get_string('question_path')+"/tgif/",
             f'{split.capitalize()}_{self.task}_question.pkl'
         )
         self.feature_path = opt.get_string('feature_path')
@@ -79,8 +79,8 @@ class VQAFeatureDataset(Dataset):
                        for answer in sample['answer_ids']]
             answer_chars = sample['answer_chars']
         else:
-            answers = [torch.LongTensor([0]) for _ in range(5)]
-            answer_chars = [torch.LongTensor([0]) for _ in range(5)]
+            answers = [torch.LongTensor([0]) for _ in range(4)]
+            answer_chars = [torch.LongTensor([0]) for _ in range(4)]
 
         answer_lengths = [len(answer) for answer in answers]
 
@@ -112,7 +112,7 @@ class VQAFeatureDataset(Dataset):
             answers[1], answer_lengths[1], answer_chars[1],
             answers[2], answer_lengths[2], answer_chars[2],
             answers[3], answer_lengths[3], answer_chars[3],
-            answers[4], answer_lengths[4], answer_chars[4],
+            # answers[4], answer_lengths[4], answer_chars[4],
             features, c3d_features, bbox_features, bbox,
             answer_id
         )
@@ -162,7 +162,7 @@ def collate_fn(batch):
         a2, a2_length, a2_chars,
         a3, a3_length, a3_chars,
         a4, a4_length, a4_chars,
-        a5, a5_length, a5_chars,
+        # a5, a5_length, a5_chars,
         features, c3d_features, bbox_features, bbox,
         answer
     ) = zip(*batch)
@@ -183,9 +183,9 @@ def collate_fn(batch):
     a4 = pad_sequence(a4, batch_first=True)
     a4_length = torch.LongTensor(a4_length)
     a4_chars = pad_sequence(a4_chars, batch_first=True)
-    a5 = pad_sequence(a5, batch_first=True)
-    a5_length = torch.LongTensor(a5_length)
-    a5_chars = pad_sequence(a5_chars, batch_first=True)
+    # a5 = pad_sequence(a5, batch_first=True)
+    # a5_length = torch.LongTensor(a5_length)
+    # a5_chars = pad_sequence(a5_chars, batch_first=True)
 
     features = cat_into_shared_memory(features)
     c3d_features = cat_into_shared_memory(c3d_features)
@@ -202,7 +202,7 @@ def collate_fn(batch):
         a2, a2_length, a2_chars,
         a3, a3_length, a3_chars,
         a4, a4_length, a4_chars,
-        a5, a5_length, a5_chars,
+        # a5, a5_length, a5_chars,
         features, c3d_features, bbox_features, bbox,
         answer
     )

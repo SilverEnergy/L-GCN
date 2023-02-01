@@ -67,13 +67,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-n', '--num-workers', type=int, default=4
+    '-n', '--num-workers', type=int, default=0
 )
 parser.add_argument(
     '-p', '--part', help='path to pt file'
 )
 parser.add_argument(
-    '--num-boxes', type=int
+    '--num-boxes', type=int, default =5
 )
 parser.add_argument(
     '-a', '--arch', help='vgg16, c3d = 4096, resnet = 2048', default='resnet152'
@@ -100,10 +100,16 @@ class VideoDataset(Dataset):
         self.video_dict = defaultdict(list)
 
         if args.arch == 'resnet152':
+            # print("#################################")
+            # print("resnet~~~~~~~~~~~~~~~~~~~~~~")
             for gif_name, num_frames in keys.items():
-                for i in range(num_frames):
+                # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                # print(gif_name, type(gif_name))
+                list_file = os.listdir("/data/user/data2/STAR/STAR/Situation Video Data/Keyframe Dumping Tool from Action Genome/dataset/ag/frames/"+gif_name)
+                #print(list_file)
+                for x in list_file:
                     self.video_dict[gif_name].append(
-                        os.path.join(self.root, gif_name, f'{i}.jpg')
+                        os.path.join(self.root, gif_name, x)
                     )
         elif args.arch == 'vgg16':
             samples: List[str] = load_pickle(args.frame_path)
@@ -307,8 +313,9 @@ def extract_features(args):
             # import ipdb; ipdb.set_trace()
             fp[current_index: current_index + current_batch_size] = output.view(
                 current_batch_size, args.num_boxes, out_channels).cpu().numpy()
-
+    print("###############")
     print(fp[N - 1])
+    print("!!!!!!!!!!!!!!!")
     del fp
 
     loader.dataset.save_indices(args.output_dir)

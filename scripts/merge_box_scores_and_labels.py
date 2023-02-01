@@ -48,8 +48,9 @@ class Args(TypedArgs):
 
 
 def load_bboxes(args: Args) -> List[SplitData]:
-
-    splits = os.listdir(args.bboxes)
+    # print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    # print(str(args.bboxes))
+    splits = os.listdir('data/tgif/bboxes_splits')
 
     # splits.remove('split5.pt.bak')
 
@@ -57,7 +58,7 @@ def load_bboxes(args: Args) -> List[SplitData]:
     print(splits)
 
     for split in tqdm(splits):
-        data = torch.load(os.path.join(args.bboxes, split))
+        data = torch.load(os.path.join('data/tgif/bboxes_splits', split))
         yield data
 
 
@@ -71,7 +72,10 @@ def count_frames(args: Args):
 
 
 def main(args: Args):
-    os.makedirs(args.output, exist_ok=True)
+    # print("#########################################")
+    # print("type: ", type(args.output))
+    # print("args.output = ", str(args.output), type(str))
+    os.makedirs('data/tgif/bboxes', exist_ok=True)
 
     num_frames = count_frames(args)
 
@@ -95,10 +99,10 @@ def main(args: Args):
 
     # We don't need scores and labels
     fp_bbox = open_memmap(
-        os.path.join(args.output, 'data.npy'),
+        os.path.join('data/tgif/bboxes', 'data.npy'),
         mode='w+',
         dtype=np.float32,
-        shape=(num_frames, args.num_bboxes, 4)
+        shape=(num_frames, 5, 4)
     )
 
     indices = dict()
@@ -118,14 +122,14 @@ def main(args: Args):
                 frame_bbox = frame['bbox']
 
                 N = frame_labels.shape[0]
-                N = min(N, args.num_bboxes)
+                N = min(N, 5)
                 # print(frame_labels.shape)
                 # print(frame_scores.shape)
                 # exit()
                 new_labels = torch.empty(
-                    (args.num_bboxes,), dtype=frame_labels.dtype).fill_(-1)
-                new_scores = torch.zeros((args.num_bboxes,))
-                new_bbox = torch.zeros((args.num_bboxes, 4))
+                    (5,), dtype=frame_labels.dtype).fill_(-1)
+                new_scores = torch.zeros((5,))
+                new_bbox = torch.zeros((5, 4))
 
                 new_labels[:N] = frame_labels[:N]
                 new_scores[:N] = frame_scores[:N]
@@ -153,7 +157,7 @@ def main(args: Args):
     # del fp_labels
     # del fp_scores
 
-    dump_pickle(indices, os.path.join(args.output, 'indices.pkl'))
+    dump_pickle(indices, os.path.join('data/tgif/bboxes', 'indices.pkl'))
 
 
 if __name__ == "__main__":

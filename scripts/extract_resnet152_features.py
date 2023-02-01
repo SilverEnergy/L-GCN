@@ -43,7 +43,7 @@ parser.add_argument('-i', '--input-dir', help='path to tgif frames')
 parser.add_argument('-o', '--output-dir', default='data/tgif/resnet152_pool5_features',
                     help='path to save the output features')
 parser.add_argument('-b', '--batch-size', type=int, default=512)
-parser.add_argument('-n', '--num-workers', type=int, default=4)
+parser.add_argument('-n', '--num-workers', type=int, default=0)
 
 
 class MyDataset:
@@ -94,10 +94,13 @@ def get_dataloader(args):
 def extract_features(args):
 
     model = get_model()
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!")
     loader = get_dataloader(args)
+    print("@@@@@@@@@@@@@@@@@@@@")
 
     N = len(loader.dataset)
-
+    print("#######################")
+    print(N)
     fp = open_memmap(
         os.path.join(args.output_dir, 'data.npy'),
         mode='w+',

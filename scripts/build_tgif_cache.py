@@ -56,7 +56,7 @@ def load_csv(path: str) -> pd.DataFrame:
     return pd.read_csv(path, sep='\t')
 
 
-def build_answer_dict(args: Args) -> Dict[str, int]:
+def build_answer_dict(args) -> Dict[str, int]:
     answer_dict_path = os.path.join(
         args.output_path, 'frameqa_answer_dict.pkl')
 
@@ -82,7 +82,7 @@ def build_answer_dict(args: Args) -> Dict[str, int]:
     return answer_dict
 
 
-def build_pretrained_embedding(args: Args, task: str, dictionary: Dictionary, vector: vocab.Vocab):
+def build_pretrained_embedding(args, task: str, dictionary: Dictionary, vector: vocab.Vocab):
     embedding_path = os.path.join(args.output_path, f'{task}_embedding.pt')
 
     if os.path.exists(embedding_path):
@@ -101,7 +101,7 @@ def build_pretrained_embedding(args: Args, task: str, dictionary: Dictionary, ve
     torch.save(weights, embedding_path)
 
 
-def process_open_ended(args: Args, task: str, dictionary: Dictionary, char_dictionary: CharDictionary,
+def process_open_ended(args, task: str, dictionary: Dictionary, char_dictionary: CharDictionary,
                        answer_dict: Dict[str, int] = None):
     def process(split: str):
         print(f'processing {task} {split}')
@@ -143,7 +143,7 @@ def process_open_ended(args: Args, task: str, dictionary: Dictionary, char_dicti
     process('Test')
 
 
-def build_dictionary(args: Args, task: str) -> Dictionary:
+def build_dictionary(args, task: str) -> Dictionary:
     dictionary_path = os.path.join(args.output_path, f'{task}_dictionary.pkl')
 
     if os.path.exists(dictionary_path):
@@ -154,13 +154,15 @@ def build_dictionary(args: Args, task: str) -> Dictionary:
 
     def build(split: str):
         df = load_csv_from_dataset(task, split)
-
+        print(task, split)
+        print(df)
+        print("##########")
         for question in df['question']:
             dictionary.tokenize(
                 question, add_word=True, extra_dict=glove.stoi if split == 'Test' else None)
 
         if task in MULTIPLE_CHOICE_TASKS:
-            for answer_key in ['a1', 'a2', 'a3', 'a4', 'a5']:
+            for answer_key in ['a1', 'a2', 'a3', 'a4']:
                 for answer in df[answer_key]:
                     dictionary.tokenize(
                         answer, add_word=True, extra_dict=glove.stoi if split == 'Test' else None)
@@ -172,7 +174,7 @@ def build_dictionary(args: Args, task: str) -> Dictionary:
     return dictionary
 
 
-def build_char_dictionary(args: Args, task: str) -> Dictionary:
+def build_char_dictionary(args, task: str) -> Dictionary:
     dictionary_path = os.path.join(
         args.output_path, f'{task}_char_dictionary.pkl')
 
@@ -190,7 +192,7 @@ def build_char_dictionary(args: Args, task: str) -> Dictionary:
                 question, add_word=True, extra_dict=glove.stoi if split == 'Test' else None)
 
         if task in MULTIPLE_CHOICE_TASKS:
-            for answer_key in ['a1', 'a2', 'a3', 'a4', 'a5']:
+            for answer_key in ['a1', 'a2', 'a3', 'a4']:
                 for answer in df[answer_key]:
                     dictionary.tokenize(
                         answer, add_word=True, extra_dict=glove.stoi if split == 'Test' else None)
@@ -202,7 +204,7 @@ def build_char_dictionary(args: Args, task: str) -> Dictionary:
     return dictionary
 
 
-def process_multiple_choice(args: Args, task: str, dictionary: Dictionary, char_dictionary: CharDictionary):
+def process_multiple_choice(args, task: str, dictionary: Dictionary, char_dictionary: CharDictionary):
     def process(split: str):
         print(f'processing {task} {split}')
         data = []
@@ -210,7 +212,7 @@ def process_multiple_choice(args: Args, task: str, dictionary: Dictionary, char_
 
         for index, row in tqdm(df.iterrows(), total=len(df)):
             question = row['question']
-            answer_keys = ['a1', 'a2', 'a3', 'a4', 'a5']
+            answer_keys = ['a1', 'a2', 'a3', 'a4']
             answers = [row[key] for key in answer_keys]
             gif_name = row['gif_name']
             answer_id = int(row['answer'])
@@ -250,29 +252,29 @@ if __name__ == "__main__":
 
     glove = vocab.GloVe()
 
-    if 'frameqa' in args.tasks:
-        answer_dict = build_answer_dict(args)
-        dictionary = build_dictionary(args, 'frameqa')
-        char_dictionary = build_char_dictionary(args, 'frameqa')
-        build_pretrained_embedding(args, 'frameqa', dictionary, glove)
-        process_open_ended(args, 'frameqa', dictionary,
-                           char_dictionary, answer_dict=answer_dict)
+    # if 'frameqa' in args.tasks:
+    #     answer_dict = build_answer_dict(args)
+    #     dictionary = build_dictionary(args, 'frameqa')
+    #     char_dictionary = build_char_dictionary(args, 'frameqa')
+    #     build_pretrained_embedding(args, 'frameqa', dictionary, glove)
+    #     process_open_ended(args, 'frameqa', dictionary,
+    #                        char_dictionary, answer_dict=answer_dict)
 
-    if 'count' in args.tasks:
-        dictionary = build_dictionary(args, 'count')
-        char_dictionary = build_char_dictionary(args, 'count')
-        build_pretrained_embedding(args, 'count', dictionary, glove)
-        process_open_ended(args, 'count', dictionary, char_dictionary)
+    # if 'count' in args.tasks:
+    #     dictionary = build_dictionary(args, 'count')
+    #     char_dictionary = build_char_dictionary(args, 'count')
+    #     build_pretrained_embedding(args, 'count', dictionary, glove)
+    #     process_open_ended(args, 'count', dictionary, char_dictionary)
 
-    if 'action' in args.tasks:
-        dictionary = build_dictionary(args, 'action')
-        char_dictionary = build_char_dictionary(args, 'action')
-        build_pretrained_embedding(args, 'action', dictionary, glove)
-        process_multiple_choice(args, 'action', dictionary, char_dictionary)
+    # if 'action' in args.tasks:
+    #     dictionary = build_dictionary(args, 'action')
+    #     char_dictionary = build_char_dictionary(args, 'action')
+    #     build_pretrained_embedding(args, 'action', dictionary, glove)
+    #     process_multiple_choice(args, 'action', dictionary, char_dictionary)
 
-    if 'transition' in args.tasks:
-        dictionary = build_dictionary(args, 'transition')
-        char_dictionary = build_char_dictionary(args, 'transition')
-        build_pretrained_embedding(args, 'transition', dictionary, glove)
-        process_multiple_choice(
-            args, 'transition', dictionary, char_dictionary)
+    # if 'transition' in args.tasks:
+    dictionary = build_dictionary(args, 'transition')
+    char_dictionary = build_char_dictionary(args, 'transition')
+    build_pretrained_embedding(args, 'transition', dictionary, glove)
+    process_multiple_choice(
+        args, 'transition', dictionary, char_dictionary)

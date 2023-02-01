@@ -11,16 +11,16 @@ MULTIPLE_CHOICE_TASKS = ['action', 'transition']
 
 
 def load_csv_from_dataset(task: str, split: str) -> pd.DataFrame:
-    return pd.read_csv(f'data/dataset/{split}_{task}_question.csv', sep='\t')
+    return pd.read_csv(f'data/dataset/{split}_{task}_question.csv')
 
 
 def load_dictionary(config, task: str, level: str) -> Dictionary:
     cache_path = config.get_string('cache_path')
 
     if level == 'word':
-        return Dictionary.load_from_file(f'{cache_path}/{task}_dictionary.pkl')
+        return Dictionary.load_from_file(f'{cache_path}/tgif/{task}_dictionary.pkl')
     elif level == 'char':
-        return CharDictionary.load_from_file(f'{cache_path}/{task}_char_dictionary.pkl')
+        return CharDictionary.load_from_file(f'{cache_path}/tgif/{task}_char_dictionary.pkl')
 
 
 def load_answer_dict() -> Dict[str, int]:

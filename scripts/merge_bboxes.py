@@ -34,8 +34,8 @@ parser.add_argument('-n', '--num-bboxes', type=int, default=5,
                     help='use N bboxes, 5 is enough, 10 for ablation study')
 
 
-def load_bboxes(args: Args) -> List[NpyFile]:
-
+#def load_bboxes(args: Args) -> List[NpyFile]:
+def load_bboxes(args) -> List[NpyFile]:
     splits = os.listdir(args.bboxes)
     splits = sorted(splits)
     print(splits)
@@ -80,14 +80,21 @@ def main(args):
         os.path.join(args.output, 'data.npy'),
         mode='w+',
         dtype=np.float32,
-        shape=(total_frames, 10, 2048)
+        shape=(total_frames, 5, 2048)
     )
 
     index = 0
     for fp in tqdm(fps):
+        # print("##############")
         length = len(fp.data)
+        print(type(fp.data))
+        # print(length)
+        print(length)
+        print(np.shape(fp.data))
+        print(np.shape(new_fp[index: index + length]))
+        
         new_fp[index: index + length] = fp.data
-
+        print("##############")
         new_indices.update(get_new_indices(fp, index))
 
         index += length

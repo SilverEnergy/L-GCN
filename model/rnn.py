@@ -33,7 +33,7 @@ class RNNEncoder(nn.Module):
             input, lengths)
 
         packed_input = pack_padded_sequence(
-            sorted_input, sorted_lengths, batch_first=True)
+            sorted_input, sorted_lengths.cpu(), batch_first=True)
 
         self.rnn.flatten_parameters()
         output, hidden = self.rnn(packed_input)

@@ -54,14 +54,13 @@ def train(model: nn.Module, loader: DataLoader, criterion: nn.Module, optimzier:
     for i, data in enumerate(tqdm(loader)):
 
         data = utils.batch_to_gpu(data)
-
         (
             question, question_length, question_chars,
             a1, a1_length, a1_chars,
             a2, a2_length, a2_chars,
             a3, a3_length, a3_chars,
             a4, a4_length, a4_chars,
-            a5, a5_length, a5_chars,
+            # a5, a5_length, a5_chars,
             features, c3d_features, bbox_features, bbox,
             answer
         ) = data
@@ -75,7 +74,7 @@ def train(model: nn.Module, loader: DataLoader, criterion: nn.Module, optimzier:
             a2, a2_length, a2_chars,
             a3, a3_length, a3_chars,
             a4, a4_length, a4_chars,
-            a5, a5_length, a5_chars,
+            # a5, a5_length, a5_chars,
             features, c3d_features, bbox_features, bbox
         )
 
@@ -131,7 +130,7 @@ def test(model: nn.Module, loader: DataLoader, criterion: nn.Module, epoch: int)
             a2, a2_length, a2_chars,
             a3, a3_length, a3_chars,
             a4, a4_length, a4_chars,
-            a5, a5_length, a5_chars,
+            # a5, a5_length, a5_chars,
             features, c3d_features, bbox_features, bbox,
             answer
         ) = data
@@ -145,7 +144,7 @@ def test(model: nn.Module, loader: DataLoader, criterion: nn.Module, epoch: int)
             a2, a2_length, a2_chars,
             a3, a3_length, a3_chars,
             a4, a4_length, a4_chars,
-            a5, a5_length, a5_chars,
+            # a5, a5_length, a5_chars,
             features, c3d_features, bbox_features, bbox
         )
 

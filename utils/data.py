@@ -11,12 +11,12 @@ from tqdm import tqdm
 
 class VideoDataset(Dataset):
 
-    def __init__(self, root: str, extension='*.jpg'):
+    def __init__(self, root: str, extension='*.png'):
         self.root = root
         self.extension = extension
 
         self.videos = os.listdir(root)
-
+        print(self.videos)
         def by_index(path: str):
             basename = os.path.basename(path)
             index = os.path.splitext(basename)[0]

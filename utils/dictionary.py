@@ -14,7 +14,7 @@ class Dictionary:
             idx2word = list(word2idx.keys())
         self.word2idx = word2idx
         self.idx2word = idx2word
-        self.nlp = spacy.load('en')
+        self.nlp = spacy.load("en_core_web_sm")
 
     def _tokenize(self, sentence: str) -> List[str]:
         sentence = sentence.lower()

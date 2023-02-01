@@ -50,7 +50,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--frame-path', help='path to frames')
 parser.add_argument('-o', '--output', help='path to output pt file')
 parser.add_argument('-b', '--batch-size', default=16)
-parser.add_argument('-n', '--num-workers', type=int, default=4)
+parser.add_argument('-n', '--num-workers', type=int, default=0)
 parser.add_argument('--msvd', action='store_true', help='for MSVD-QA')
 parser.add_argument(
     '-c', '--config', help='path to e2e_mask_rcnn_R_101_FPN_1x_caffe2.yaml')
@@ -143,6 +143,14 @@ class GIFDataset(Dataset):
             gif_name = sample.split('/')[-1]
             self.videos.append(gif_name)
             num_frames = len(os.listdir(sample))
+            ###은기 수정부분 ###
+            file_list = os.listdir(sample)
+            # for element in file_list:
+            #     print(type(element))
+            #     element = str(element)
+            #     print(type(element))
+            #     print(element[2:-1])
+            ###################
             # if MSVD:
             if args.msvd:
                 selected_frames = np.linspace(
@@ -154,10 +162,14 @@ class GIFDataset(Dataset):
                     )
 
             else:
-                for n in range(num_frames):
+                for element in file_list:
+                    element = str(element)
                     self.video_dict[gif_name].append(
-                        os.path.join(sample, f'{n}.jpg')  # For TGIF-QA
+                        # os.path.join(sample, f'{n}.jpg')  # For TGIF-QA
                         # os.path.join(sample, f'{n + 1:06}.jpg')  # For MSVD-QA
+                        #print(f'{element}.png')
+                        
+                        os.path.join(sample, element[2:-1]) # For STAR dataset
                     )
 
         # self.frame_dataset = FrameDataset(cfg)
